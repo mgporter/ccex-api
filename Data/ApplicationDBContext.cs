@@ -9,6 +9,15 @@ public class ApplicationDBContext : DbContext
   : base(options)
   {}
 
+  protected override void OnModelCreating(ModelBuilder modelBuilder)
+  {
+    modelBuilder.Entity<ChineseCharacter>()
+      .HasMany(e => e.Variants)
+      .WithOne(e => e.Base)
+      .HasForeignKey(e => e.BaseId);
+    
+  }
+
   public DbSet<ChineseCharacter> ChineseCharacter { get; set; } = null!;
 
   public DbSet<Pinyin> Pinyin { get; set; } = null!;

@@ -12,8 +12,8 @@ public static class DBResourceLoader
     DbContext context
   )
   {
-    using (TransactionScope scope = new TransactionScope())
-    {
+    // using (TransactionScope scope = new TransactionScope())
+    // {
       // var context = CreateContext();
       try {
         
@@ -29,8 +29,8 @@ public static class DBResourceLoader
         // context.Dispose();
       }
 
-      scope.Complete();
-    }
+    //   scope.Complete();
+    // }
 
   }
 
