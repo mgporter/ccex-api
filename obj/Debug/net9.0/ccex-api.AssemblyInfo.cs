@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("ccex-api")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+ec12e7c7a194c809fa8219eb9f46c7a7d34fa105")]
 [assembly: System.Reflection.AssemblyProductAttribute("ccex-api")]
 [assembly: System.Reflection.AssemblyTitleAttribute("ccex-api")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

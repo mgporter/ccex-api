@@ -1,5 +1,8 @@
 namespace ccex_api.Controllers;
 
+using ccex_api.DTOs;
+using ccex_api.Mappers;
+using ccex_api.Models;
 using ccex_api.Repositories;
 using Microsoft.AspNetCore.Mvc;
 
@@ -14,5 +17,27 @@ public class ChineseCharacterController : ControllerBase
     _repo = repo;
   }
 
+  [HttpGet]
+  public async Task<IActionResult> GetAll()
+  {
+    List<ChineseCharacter> chars = await _repo.GetAllAsync();
+
+    var basicChars = chars.Select(c => c.ToBasicDTO());
+
+    return Ok(basicChars);
+  }
+
+  [HttpGet("{id:int}")]
+  public async Task<IActionResult> GetById([FromRoute] int id)
+  {
+    var cchar = await _repo.GetByIdAsync(id);
+
+    if (cchar == null)
+    {
+      return NotFound();
+    }
+
+    return Ok(cchar.ToDTO());
+  }
   
 }

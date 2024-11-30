@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace ccex_api.Repositories;
 
-public class PinyinRepository
+public class PinyinRepository : IPinyinRepository
 {
   private readonly ApplicationDBContext _context;
 

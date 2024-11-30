@@ -122,3 +122,4 @@ C:\Users\micha\repos\chinese-character-explorer\ccex-api\obj\Debug\net9.0\refint
 C:\Users\micha\repos\chinese-character-explorer\ccex-api\obj\Debug\net9.0\ccex-api.pdb
 C:\Users\micha\repos\chinese-character-explorer\ccex-api\obj\Debug\net9.0\ccex-api.genruntimeconfig.cache
 C:\Users\micha\repos\chinese-character-explorer\ccex-api\obj\Debug\net9.0\ref\ccex-api.dll
+C:\Users\micha\repos\chinese-character-explorer\ccex-api\obj\Debug\net9.0\ccex-api.sourcelink.json
