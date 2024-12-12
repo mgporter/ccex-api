@@ -39,5 +39,18 @@ public class ChineseCharacterController : ControllerBase
 
     return Ok(cchar.ToDTO());
   }
+
+  [HttpGet("{chineseCharacter}")]
+  public async Task<IActionResult> GetByChar([FromRoute] string chineseCharacter)
+  {
+    var cchar = await _repo.GetByCharAsync(chineseCharacter);
+
+    if (cchar == null)
+    {
+      return NotFound();
+    }
+
+    return Ok(cchar.ToDTO());
+  }
   
 }

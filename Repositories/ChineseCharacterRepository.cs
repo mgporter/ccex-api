@@ -27,7 +27,24 @@ public class ChineseCharacterRepository : IChineseCharacterRepository
 
   public async Task<ChineseCharacter?> GetByIdAsync(int id)
   {
-    return await _context.ChineseCharacter.FirstOrDefaultAsync(x => x.Id == id);
+    return await _context.ChineseCharacter
+      .Include(x => x.TradChars)
+      .Include(x => x.Components)
+      .Include(x => x.Variants)
+      .Include(x => x.Derivatives)
+      .Include(x => x.AllPinyin)
+      .FirstOrDefaultAsync(x => x.Id == id);
+  }
+
+  public async Task<ChineseCharacter?> GetByCharAsync(string cchar)
+  {
+    return await _context.ChineseCharacter
+      .Include(x => x.TradChars)
+      .Include(x => x.Components)
+      .Include(x => x.Variants)
+      .Include(x => x.Derivatives)
+      .Include(x => x.AllPinyin)
+      .FirstOrDefaultAsync(x => x.Char == cchar);
   }
 
 }

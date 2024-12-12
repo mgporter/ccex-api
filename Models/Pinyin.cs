@@ -1,5 +1,9 @@
+using Microsoft.EntityFrameworkCore;
+
 namespace ccex_api.Models;
 
+[Index(nameof(Syllable), nameof(ToneNumber), IsUnique = true)]
+[Index(nameof(SyllableWithToneMark), IsUnique = true)]
 public class Pinyin
 {
   public int Id { get; set; }

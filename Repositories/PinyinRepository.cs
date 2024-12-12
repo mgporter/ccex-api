@@ -28,4 +28,9 @@ public class PinyinRepository : IPinyinRepository
   {
     return await _context.Pinyin.FirstOrDefaultAsync(x => x.Id == id);
   }
+
+  public async Task<Pinyin?> GetBySyllableAndToneMarkAsync(string syllable)
+  {
+    return await _context.Pinyin.FirstOrDefaultAsync(x => x.SyllableWithToneMark == syllable);
+  }
 }

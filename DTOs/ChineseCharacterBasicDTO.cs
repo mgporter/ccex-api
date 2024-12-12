@@ -1,5 +1,3 @@
-using ccex_api.Models;
-
 namespace ccex_api.DTOs;
 
 public class ChineseCharacterBasicDTO

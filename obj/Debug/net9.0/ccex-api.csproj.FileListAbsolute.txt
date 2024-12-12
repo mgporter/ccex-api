@@ -123,3 +123,6 @@ C:\Users\micha\repos\chinese-character-explorer\ccex-api\obj\Debug\net9.0\ccex-a
 C:\Users\micha\repos\chinese-character-explorer\ccex-api\obj\Debug\net9.0\ccex-api.genruntimeconfig.cache
 C:\Users\micha\repos\chinese-character-explorer\ccex-api\obj\Debug\net9.0\ref\ccex-api.dll
 C:\Users\micha\repos\chinese-character-explorer\ccex-api\obj\Debug\net9.0\ccex-api.sourcelink.json
+c:\Users\micha\repos\chinese-character-explorer\ccex-api\bin\Debug\net9.0\Init\ChineseCharacterData.json
+c:\Users\micha\repos\chinese-character-explorer\ccex-api\bin\Debug\net9.0\Newtonsoft.Json.dll
+C:\Users\micha\repos\chinese-character-explorer\ccex-api\bin\Debug\net9.0\Init\PinyinData.json
