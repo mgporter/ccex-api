@@ -2,6 +2,7 @@ using ccex_api.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using Newtonsoft.Json;
+using ccex_api.Aggregates;
 
 namespace ccex_api.Init;
 
@@ -9,13 +10,15 @@ public static class DBResourceLoader
 {
 
   private static DbContext _context = null!;
+  private readonly static string characterDataFile = "./DataFiles/ChineseCharacterData.json";
+  private readonly static string pinyinDataFile = "./DataFiles/PinyinData.json";
 
   public static void LoadInitialCharData(DbContext context)
   {
     _context = context;
     int batchsize = 100;
 
-    List<ChineseCharacterInit> characterData = loadCharacterData();
+    List<ChineseCharacterInit> characterData = LoadCharacterData();
     ContextDelegate<ChineseCharacterInit> AddCharactersDelegate = AddCharacters;
 
     Console.WriteLine("Adding characters to the database");
@@ -26,7 +29,7 @@ public static class DBResourceLoader
     _context.SaveChanges();
     
 
-    List<PinyinInit> pinyinData = loadPinyinData();
+    List<PinyinInit> pinyinData = LoadPinyinData();
     ContextDelegate<PinyinInit> AddPinyinDelegate = AddPinyin;
 
     Console.WriteLine("Adding pinyin to the database");
@@ -100,7 +103,7 @@ public static class DBResourceLoader
     foreach (string c in cchar.Variants)
     {
       ChineseCharacter? component = _context.Set<ChineseCharacter>().FirstOrDefault(x => x.Char == c) ??
-        throw new Exception($"Derivative not found: {c}");
+        throw new Exception($"Variant not found: {c}");
 
       character.Variants.Add(component);
     }
@@ -108,25 +111,9 @@ public static class DBResourceLoader
     if (cchar.Base != null)
     {
       ChineseCharacter? component = _context.Set<ChineseCharacter>().FirstOrDefault(x => x.Char == cchar.Base) ??
-        throw new Exception($"Derivative not found: {cchar.Base}");
+        throw new Exception($"Base not found: {cchar.Base}");
 
       character.Base = component;
-    }
-
-    foreach (string c in cchar.AllPinyin)
-    {
-      Pinyin? pinyin = _context.Set<Pinyin>().FirstOrDefault(x => x.SyllableWithToneMark == c) ??
-        throw new Exception($"Pinyin not found: {c}");
-
-      character.AllPinyin.Add(pinyin);
-    }
-
-    if (cchar.MainPinyin != null)
-    {
-      Pinyin? pinyin = _context.Set<Pinyin>().FirstOrDefault(x => x.SyllableWithToneMark == cchar.MainPinyin) ??
-        throw new Exception($"Pinyin not found: {cchar.MainPinyin}");
-
-      character.MainPinyin = pinyin;
     }
 
   }
@@ -137,12 +124,15 @@ public static class DBResourceLoader
           Char = c.Char,
           Definition = c.Definition,
           Description = c.Description,
+          Pinyin = c.Pinyin
         }).ToList();
 
     _context.Set<ChineseCharacter>().Add(
       new ChineseCharacter {
         Char = cchar.Char,
         TradChars = TradChars,
+        PrimaryPinyin = cchar.PrimaryPinyin,
+        SecondaryPinyin = cchar.SecondaryPinyin,
         Definition = cchar.Definition,
         Description = cchar.Description,
         Frequency = cchar.Frequency
@@ -161,9 +151,9 @@ public static class DBResourceLoader
     );
   }
 
-  private static List<ChineseCharacterInit> loadCharacterData()
+  private static List<ChineseCharacterInit> LoadCharacterData()
   {
-    using StreamReader reader = new StreamReader("./Init/ChineseCharacterData.json");
+    using StreamReader reader = new StreamReader(characterDataFile);
 
     var objects = JsonConvert.DeserializeObject<List<ChineseCharacterInit>>(reader.ReadToEnd()) ??
       throw new Exception("JSON parsing problem");
@@ -171,9 +161,9 @@ public static class DBResourceLoader
     return objects;
   }
 
-  private static List<PinyinInit> loadPinyinData()
+  private static List<PinyinInit> LoadPinyinData()
   {
-    using StreamReader reader = new StreamReader("./Init/PinyinData.json");
+    using StreamReader reader = new StreamReader(pinyinDataFile);
 
     var objects = JsonConvert.DeserializeObject<List<PinyinInit>>(reader.ReadToEnd()) ??
       throw new Exception("JSON parsing problem");

@@ -23,7 +23,6 @@ builder.Services.AddDbContext<ApplicationDBContext>(optionsBuilder => {
 });
 
 builder.Services.AddScoped<IChineseCharacterRepository, ChineseCharacterRepository>();
-builder.Services.AddScoped<ITradCharacterStubRepository, TradCharacterStubRepository>();
 builder.Services.AddScoped<IPinyinRepository, PinyinRepository>();
 
 

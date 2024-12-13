@@ -22,8 +22,7 @@ public static class ChineseCharacterMapper
       Id = cchar.Id,
       Char = cchar.Char,
       Components = cchar.Components.Select(c => c.ToComponentDTO()).ToList(),
-      MainPinyin = cchar.MainPinyin?.ToBasicDTO(),
-      AllPinyins = cchar.AllPinyin.Select(p => p.ToBasicDTO()).ToList(),
+      PrimaryPinyin = cchar.PrimaryPinyin,
       Frequency = cchar.Frequency
     };
   }
@@ -34,8 +33,7 @@ public static class ChineseCharacterMapper
       Id = cchar.Id,
       Char = cchar.Char,
       Derivatives = cchar.Derivatives.Select(c => c.ToDerivativeDTO()).ToList(),
-      MainPinyin = cchar.MainPinyin?.ToBasicDTO(),
-      AllPinyins = cchar.AllPinyin.Select(p => p.ToBasicDTO()).ToList(),
+      PrimaryPinyin = cchar.PrimaryPinyin,
       Frequency = cchar.Frequency
     };
   }
@@ -45,14 +43,13 @@ public static class ChineseCharacterMapper
     return new ChineseCharacterDTO {
       Id = cchar.Id,
       Char = cchar.Char,
-      TradChars = cchar.TradChars.Select(c => c.ToDTO()).ToList(),
+      TradChars = cchar.TradChars,
       Components = cchar.Components.Select(c => c.ToComponentDTO()).ToList(),
       Derivatives = cchar.Derivatives.Select(c => c.ToDerivativeDTO()).ToList(),
       Variants = cchar.Variants.Select(c => c.ToBasicDTO()).ToList(),
-      BaseId = cchar.BaseId,
       Base = cchar.Base?.ToBasicDTO(),
-      MainPinyin = cchar.MainPinyin?.ToBasicDTO(),
-      AllPinyins = cchar.AllPinyin.Select(p => p.ToBasicDTO()).ToList(),
+      PrimaryPinyin = cchar.PrimaryPinyin,
+      SecondaryPinyin = cchar.SecondaryPinyin,
       Definition = cchar.Definition,
       Description = cchar.Description,
       Frequency = cchar.Frequency

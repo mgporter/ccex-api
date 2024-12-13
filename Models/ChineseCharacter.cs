@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using ccex_api.Aggregates;
 
 namespace ccex_api.Models;
 
@@ -13,9 +14,8 @@ public class ChineseCharacter
   public ICollection<ChineseCharacter> Variants { get; set; } = [];
   public int? BaseId { get; set; } = null;
   public ChineseCharacter? Base { get; set; }
-  public Pinyin? MainPinyin { get; set; }
-  public int? MainPinyinId { get; set; }
-  public ICollection<Pinyin> AllPinyin { get; set; } = [];
+  public ICollection<string> PrimaryPinyin { get; set; } = [];
+  public ICollection<string> SecondaryPinyin { get; set; } = [];
   public string Definition { get; set; } = string.Empty;
   public string Description { get; set; } = string.Empty;
   public int Frequency { get; set; }

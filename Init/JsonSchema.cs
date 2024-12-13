@@ -9,8 +9,8 @@ public class ChineseCharacterInit
   public ICollection<string> Derivatives { get; set; } = [];
   public ICollection<string> Variants { get; set; } = [];
   public string? Base { get; set; }
-  public string? MainPinyin { get; set; }
-  public ICollection<string> AllPinyin { get; set; } = [];
+  public ICollection<string> PrimaryPinyin { get; set; } = [];
+  public ICollection<string> SecondaryPinyin { get; set; } = [];
   public string Definition { get; set; } = string.Empty;
   public string Description { get; set; } = string.Empty;
   public int Frequency { get; set; }

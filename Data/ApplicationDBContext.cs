@@ -1,4 +1,5 @@
 using ccex_api.Models;
+using ccex_api.Aggregates;
 using Microsoft.EntityFrameworkCore;
 
 namespace ccex_api.Data;
@@ -11,26 +12,23 @@ public class ApplicationDBContext : DbContext
 
   protected override void OnModelCreating(ModelBuilder modelBuilder)
   {
+
+    modelBuilder.UseHiLo();
+
     modelBuilder.Entity<ChineseCharacter>()
       .HasMany(e => e.Variants)
       .WithOne(e => e.Base)
       .HasForeignKey(e => e.BaseId);
 
     modelBuilder.Entity<ChineseCharacter>()
-      .HasMany(e => e.AllPinyin)
-      .WithMany(e => e.Chars);
+      .OwnsMany(c => c.TradChars, cBuilder => {
+        cBuilder.ToJson();
+      });
 
-    modelBuilder.Entity<ChineseCharacter>()
-      .HasOne(e => e.MainPinyin)
-      .WithMany()
-      .HasForeignKey(e => e.MainPinyinId);
-    
   }
 
   public DbSet<ChineseCharacter> ChineseCharacter { get; set; } = null!;
 
   public DbSet<Pinyin> Pinyin { get; set; } = null!;
-
-  public DbSet<TradCharacterStub> TradCharacterStub { get; set; } = null!;
 
 }

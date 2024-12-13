@@ -36,21 +36,6 @@ namespace ccex_api.Migrations
                     b.ToTable("ChineseCharacterChineseCharacter");
                 });
 
-            modelBuilder.Entity("ChineseCharacterPinyin", b =>
-                {
-                    b.Property<int>("AllPinyinId")
-                        .HasColumnType("integer");
-
-                    b.Property<int>("CharsId")
-                        .HasColumnType("integer");
-
-                    b.HasKey("AllPinyinId", "CharsId");
-
-                    b.HasIndex("CharsId");
-
-                    b.ToTable("ChineseCharacterPinyin");
-                });
-
             modelBuilder.Entity("ccex_api.Models.ChineseCharacter", b =>
                 {
                     b.Property<int>("Id")
@@ -77,8 +62,16 @@ namespace ccex_api.Migrations
                     b.Property<int>("Frequency")
                         .HasColumnType("integer");
 
-                    b.Property<int?>("MainPinyinId")
+                    b.Property<int?>("PinyinId")
                         .HasColumnType("integer");
+
+                    b.PrimitiveCollection<string[]>("PrimaryPinyin")
+                        .IsRequired()
+                        .HasColumnType("text[]");
+
+                    b.PrimitiveCollection<string[]>("SecondaryPinyin")
+                        .IsRequired()
+                        .HasColumnType("text[]");
 
                     b.HasKey("Id");
 
@@ -87,7 +80,7 @@ namespace ccex_api.Migrations
                     b.HasIndex("Char")
                         .IsUnique();
 
-                    b.HasIndex("MainPinyinId");
+                    b.HasIndex("PinyinId");
 
                     b.ToTable("ChineseCharacter");
                 });
@@ -111,48 +104,15 @@ namespace ccex_api.Migrations
                     b.Property<int>("ToneNumber")
                         .HasColumnType("integer");
 
-                    b.Property<int?>("TradCharacterStubId")
-                        .HasColumnType("integer");
-
                     b.HasKey("Id");
 
                     b.HasIndex("SyllableWithToneMark")
                         .IsUnique();
 
-                    b.HasIndex("TradCharacterStubId");
-
                     b.HasIndex("Syllable", "ToneNumber")
                         .IsUnique();
 
                     b.ToTable("Pinyin");
-                });
-
-            modelBuilder.Entity("ccex_api.Models.TradCharacterStub", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Char")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("Definition")
-                        .HasColumnType("text");
-
-                    b.Property<string>("Description")
-                        .HasColumnType("text");
-
-                    b.Property<int>("SimpCharId")
-                        .HasColumnType("integer");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("SimpCharId");
-
-                    b.ToTable("TradCharacterStub");
                 });
 
             modelBuilder.Entity("ChineseCharacterChineseCharacter", b =>
@@ -170,64 +130,62 @@ namespace ccex_api.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("ChineseCharacterPinyin", b =>
-                {
-                    b.HasOne("ccex_api.Models.Pinyin", null)
-                        .WithMany()
-                        .HasForeignKey("AllPinyinId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("ccex_api.Models.ChineseCharacter", null)
-                        .WithMany()
-                        .HasForeignKey("CharsId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
             modelBuilder.Entity("ccex_api.Models.ChineseCharacter", b =>
                 {
                     b.HasOne("ccex_api.Models.ChineseCharacter", "Base")
                         .WithMany("Variants")
                         .HasForeignKey("BaseId");
 
-                    b.HasOne("ccex_api.Models.Pinyin", "MainPinyin")
-                        .WithMany()
-                        .HasForeignKey("MainPinyinId");
+                    b.HasOne("ccex_api.Models.Pinyin", null)
+                        .WithMany("Chars")
+                        .HasForeignKey("PinyinId");
+
+                    b.OwnsMany("ccex_api.Aggregates.TradCharacterStub", "TradChars", b1 =>
+                        {
+                            b1.Property<int>("ChineseCharacterId")
+                                .HasColumnType("integer");
+
+                            b1.Property<int>("__synthesizedOrdinal")
+                                .ValueGeneratedOnAdd()
+                                .HasColumnType("integer");
+
+                            b1.Property<string>("Char")
+                                .IsRequired()
+                                .HasColumnType("text");
+
+                            b1.Property<string>("Definition")
+                                .HasColumnType("text");
+
+                            b1.Property<string>("Description")
+                                .HasColumnType("text");
+
+                            b1.PrimitiveCollection<string[]>("Pinyin")
+                                .IsRequired()
+                                .HasColumnType("text[]");
+
+                            b1.HasKey("ChineseCharacterId", "__synthesizedOrdinal");
+
+                            b1.ToTable("ChineseCharacter");
+
+                            b1.ToJson("TradChars");
+
+                            b1.WithOwner()
+                                .HasForeignKey("ChineseCharacterId");
+                        });
 
                     b.Navigation("Base");
 
-                    b.Navigation("MainPinyin");
-                });
-
-            modelBuilder.Entity("ccex_api.Models.Pinyin", b =>
-                {
-                    b.HasOne("ccex_api.Models.TradCharacterStub", null)
-                        .WithMany("Pinyin")
-                        .HasForeignKey("TradCharacterStubId");
-                });
-
-            modelBuilder.Entity("ccex_api.Models.TradCharacterStub", b =>
-                {
-                    b.HasOne("ccex_api.Models.ChineseCharacter", "SimpChar")
-                        .WithMany("TradChars")
-                        .HasForeignKey("SimpCharId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("SimpChar");
+                    b.Navigation("TradChars");
                 });
 
             modelBuilder.Entity("ccex_api.Models.ChineseCharacter", b =>
                 {
-                    b.Navigation("TradChars");
-
                     b.Navigation("Variants");
                 });
 
-            modelBuilder.Entity("ccex_api.Models.TradCharacterStub", b =>
+            modelBuilder.Entity("ccex_api.Models.Pinyin", b =>
                 {
-                    b.Navigation("Pinyin");
+                    b.Navigation("Chars");
                 });
 #pragma warning restore 612, 618
         }
