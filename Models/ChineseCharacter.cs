@@ -9,8 +9,10 @@ public class ChineseCharacter
   public int Id { get; set; }
   public string Char { get; set; } = string.Empty;
   public ICollection<TradCharacterStub> TradChars { get; set; } = [];
-  public ICollection<ChineseCharacter> Components { get; set; } = [];
-  public ICollection<ChineseCharacter> Derivatives { get; set; } = [];
+  public ICollection<ComponentStub> Components { get; set; } = [];
+
+  
+  public ICollection<DerivativeStub> Derivatives { get; set; } = [];
   public ICollection<ChineseCharacter> Variants { get; set; } = [];
   public int? BaseId { get; set; } = null;
   public ChineseCharacter? Base { get; set; }

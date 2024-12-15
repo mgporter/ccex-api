@@ -1,5 +1,4 @@
 using ccex_api.Data;
-using ccex_api.DTOs;
 using ccex_api.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Query;
@@ -39,6 +38,7 @@ public class ChineseCharacterRepository : IChineseCharacterRepository
 
   public async Task<ChineseCharacter?> GetByCharAsync(string cchar)
   {
+
     // return await _context.ChineseCharacter
     //   .Include(x => x.Components)
     //   .Include(x => x.Derivatives)
@@ -52,23 +52,7 @@ public class ChineseCharacterRepository : IChineseCharacterRepository
   private IIncludableQueryable<ChineseCharacter, ChineseCharacter?> GetFullCharacterQuery()
   {
 
-    var firstChar = _context.ChineseCharacter.First();
-
-    if (firstChar != null) {
-      
-      _context.Entry(firstChar).Reference(e => e);
-
-    }
-
     return _context.ChineseCharacter
-      .Include(x => x.Components)
-      .ThenInclude(x => x.Components)
-      .ThenInclude(x => x.Components)
-      .ThenInclude(x => x.Components)
-      .Include(x => x.Derivatives
-        .OrderByDescending(d => d.Frequency)
-        .Take(10)
-      )
       .Include(x => x.Variants)
       .Include(x => x.Base);
   }

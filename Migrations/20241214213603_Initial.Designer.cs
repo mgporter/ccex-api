@@ -11,7 +11,7 @@ using ccex_api.Data;
 namespace ccex_api.Migrations
 {
     [DbContext(typeof(ApplicationDBContext))]
-    [Migration("20241213044917_Initial")]
+    [Migration("20241214213603_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -22,22 +22,10 @@ namespace ccex_api.Migrations
                 .HasAnnotation("ProductVersion", "9.0.0")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
-            NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
+            NpgsqlModelBuilderExtensions.UseHiLo(modelBuilder, "EntityFrameworkHiLoSequence");
 
-            modelBuilder.Entity("ChineseCharacterChineseCharacter", b =>
-                {
-                    b.Property<int>("ComponentsId")
-                        .HasColumnType("integer");
-
-                    b.Property<int>("DerivativesId")
-                        .HasColumnType("integer");
-
-                    b.HasKey("ComponentsId", "DerivativesId");
-
-                    b.HasIndex("DerivativesId");
-
-                    b.ToTable("ChineseCharacterChineseCharacter");
-                });
+            modelBuilder.HasSequence("EntityFrameworkHiLoSequence")
+                .IncrementsBy(10);
 
             modelBuilder.Entity("ccex_api.Models.ChineseCharacter", b =>
                 {
@@ -45,7 +33,7 @@ namespace ccex_api.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("integer");
 
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+                    NpgsqlPropertyBuilderExtensions.UseHiLo(b.Property<int>("Id"));
 
                     b.Property<int?>("BaseId")
                         .HasColumnType("integer");
@@ -94,7 +82,7 @@ namespace ccex_api.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("integer");
 
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+                    NpgsqlPropertyBuilderExtensions.UseHiLo(b.Property<int>("Id"));
 
                     b.Property<string>("Syllable")
                         .IsRequired()
@@ -118,21 +106,6 @@ namespace ccex_api.Migrations
                     b.ToTable("Pinyin");
                 });
 
-            modelBuilder.Entity("ChineseCharacterChineseCharacter", b =>
-                {
-                    b.HasOne("ccex_api.Models.ChineseCharacter", null)
-                        .WithMany()
-                        .HasForeignKey("ComponentsId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("ccex_api.Models.ChineseCharacter", null)
-                        .WithMany()
-                        .HasForeignKey("DerivativesId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
             modelBuilder.Entity("ccex_api.Models.ChineseCharacter", b =>
                 {
                     b.HasOne("ccex_api.Models.ChineseCharacter", "Base")
@@ -142,6 +115,70 @@ namespace ccex_api.Migrations
                     b.HasOne("ccex_api.Models.Pinyin", null)
                         .WithMany("Chars")
                         .HasForeignKey("PinyinId");
+
+                    b.OwnsMany("ccex_api.Aggregates.ComponentStub", "Components", b1 =>
+                        {
+                            b1.Property<int>("ChineseCharacterId")
+                                .HasColumnType("integer");
+
+                            b1.Property<int>("__synthesizedOrdinal")
+                                .ValueGeneratedOnAdd()
+                                .HasColumnType("integer");
+
+                            b1.Property<string>("Char")
+                                .IsRequired()
+                                .HasColumnType("text");
+
+                            b1.Property<int>("Frequency")
+                                .HasColumnType("integer");
+
+                            b1.Property<string>("Parent")
+                                .IsRequired()
+                                .HasColumnType("text");
+
+                            b1.PrimitiveCollection<string[]>("Pinyin")
+                                .IsRequired()
+                                .HasColumnType("text[]");
+
+                            b1.HasKey("ChineseCharacterId", "__synthesizedOrdinal");
+
+                            b1.ToTable("ChineseCharacter");
+
+                            b1.ToJson("Components");
+
+                            b1.WithOwner()
+                                .HasForeignKey("ChineseCharacterId");
+                        });
+
+                    b.OwnsMany("ccex_api.Aggregates.DerivativeStub", "Derivatives", b1 =>
+                        {
+                            b1.Property<int>("ChineseCharacterId")
+                                .HasColumnType("integer");
+
+                            b1.Property<int>("__synthesizedOrdinal")
+                                .ValueGeneratedOnAdd()
+                                .HasColumnType("integer");
+
+                            b1.Property<string>("Char")
+                                .IsRequired()
+                                .HasColumnType("text");
+
+                            b1.Property<int>("Frequency")
+                                .HasColumnType("integer");
+
+                            b1.PrimitiveCollection<string[]>("Pinyin")
+                                .IsRequired()
+                                .HasColumnType("text[]");
+
+                            b1.HasKey("ChineseCharacterId", "__synthesizedOrdinal");
+
+                            b1.ToTable("ChineseCharacter");
+
+                            b1.ToJson("Derivatives");
+
+                            b1.WithOwner()
+                                .HasForeignKey("ChineseCharacterId");
+                        });
 
                     b.OwnsMany("ccex_api.Aggregates.TradCharacterStub", "TradChars", b1 =>
                         {
@@ -177,6 +214,10 @@ namespace ccex_api.Migrations
                         });
 
                     b.Navigation("Base");
+
+                    b.Navigation("Components");
+
+                    b.Navigation("Derivatives");
 
                     b.Navigation("TradChars");
                 });

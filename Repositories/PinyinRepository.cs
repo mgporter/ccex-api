@@ -31,6 +31,8 @@ public class PinyinRepository : IPinyinRepository
 
   public async Task<Pinyin?> GetBySyllableAndToneMarkAsync(string syllable)
   {
-    return await _context.Pinyin.FirstOrDefaultAsync(x => x.SyllableWithToneMark == syllable);
+    return await _context.Pinyin
+      .Include(p => p.Chars)
+      .FirstOrDefaultAsync(x => x.SyllableWithToneMark == syllable);
   }
 }

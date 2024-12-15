@@ -23,6 +23,12 @@ public class ApplicationDBContext : DbContext
     modelBuilder.Entity<ChineseCharacter>()
       .OwnsMany(c => c.TradChars, cBuilder => {
         cBuilder.ToJson();
+      })
+      .OwnsMany(c => c.Components, cBuilder => {
+        cBuilder.ToJson();
+      })
+      .OwnsMany(c => c.Derivatives, cBuilder => {
+        cBuilder.ToJson();
       });
 
   }

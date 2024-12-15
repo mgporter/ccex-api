@@ -18,10 +18,10 @@ public static class DBResourceLoader
     _context = context;
     int batchsize = 100;
 
-    List<ChineseCharacterInit> characterData = LoadCharacterData();
-    ContextDelegate<ChineseCharacterInit> AddCharactersDelegate = AddCharacters;
 
     Console.WriteLine("Adding characters to the database");
+    List<ChineseCharacterInit> characterData = LoadCharacterData();
+    ContextDelegate<ChineseCharacterInit> AddCharactersDelegate = AddCharacters;
     for (int i = 0; i < characterData.Count; i++)
     {
       BatchOperation(AddCharactersDelegate, characterData[i], i, batchsize);
@@ -29,10 +29,9 @@ public static class DBResourceLoader
     _context.SaveChanges();
     
 
+    Console.WriteLine("Adding pinyin to the database");
     List<PinyinInit> pinyinData = LoadPinyinData();
     ContextDelegate<PinyinInit> AddPinyinDelegate = AddPinyin;
-
-    Console.WriteLine("Adding pinyin to the database");
     for (int i = 0; i < pinyinData.Count; i++)
     {
       BatchOperation(AddPinyinDelegate, pinyinData[i], i, batchsize);
@@ -40,9 +39,8 @@ public static class DBResourceLoader
     _context.SaveChanges();
 
 
-    ContextDelegate<ChineseCharacterInit> PopulateCharactersDelegate = PopulateCharacters;
-
     Console.WriteLine("Populating character fields");
+    ContextDelegate<ChineseCharacterInit> PopulateCharactersDelegate = PopulateCharacters;
     for (int i = 0; i < characterData.Count; i++)
     {
       BatchOperation(PopulateCharactersDelegate, characterData[i], i, batchsize);
@@ -50,14 +48,13 @@ public static class DBResourceLoader
     _context.SaveChanges();
 
 
-    // ContextDelegate<ChineseCharacterInit> PopulateCharactersDelegate = PopulateCharacters;
-
-    // for (int i = 0; i < characterData.Count;
-    // {
-    //   BatchOperation(PopulateCharactersDelegate, characterData[i], i, batchsize);
-    // }
-    // _context.SaveChanges();
-
+    Console.WriteLine("Populating pinyin fields");
+    ContextDelegate<PinyinInit> PopulatePinyinDelegate = PopulatePinyin;
+    for (int i = 0; i < pinyinData.Count; i++)
+    {
+      BatchOperation(PopulatePinyinDelegate, pinyinData[i], i, batchsize);
+    }
+    _context.SaveChanges();
 
   }
 
@@ -72,10 +69,13 @@ public static class DBResourceLoader
 
   private static void PopulatePinyin(PinyinInit pinyin)
   {
-    Pinyin? py = _context.Set<Pinyin>().FirstOrDefault(x => x.SyllableWithToneMark == pinyin.syllableWithToneMark) ??
+    Pinyin py = _context.Set<Pinyin>().FirstOrDefault(x => x.SyllableWithToneMark == pinyin.syllableWithToneMark) ??
       throw new Exception($"Pinyin not found: {pinyin.syllableWithToneMark}");
 
-    // _context.Set<Pinyin>().SelectMany(x =>)
+    ICollection<ChineseCharacter> cchars = _context.Set<ChineseCharacter>()
+      .Where(x => x.PrimaryPinyin.Contains(py.SyllableWithToneMark)).ToList();
+
+    py.Chars = cchars;
   }
 
   private static void PopulateCharacters(ChineseCharacterInit cchar)
@@ -84,21 +84,6 @@ public static class DBResourceLoader
     ChineseCharacter? character = _context.Set<ChineseCharacter>().FirstOrDefault(x => x.Char == cchar.Char) ??
       throw new Exception($"Character not found: {cchar.Char}");
 
-    foreach (string c in cchar.Components)
-    {
-      ChineseCharacter? component = _context.Set<ChineseCharacter>().FirstOrDefault(x => x.Char == c) ??
-        throw new Exception($"Component not found: {c}");
-
-      character.Components.Add(component);
-    }
-
-    foreach (string c in cchar.Derivatives)
-    {
-      ChineseCharacter? component = _context.Set<ChineseCharacter>().FirstOrDefault(x => x.Char == c) ??
-        throw new Exception($"Derivative not found: {c}");
-
-      character.Derivatives.Add(component);
-    }
 
     foreach (string c in cchar.Variants)
     {
@@ -120,17 +105,13 @@ public static class DBResourceLoader
 
   private static void AddCharacters(ChineseCharacterInit cchar)
   {
-    var TradChars = cchar.TradChars.Select(c => new TradCharacterStub {
-          Char = c.Char,
-          Definition = c.Definition,
-          Description = c.Description,
-          Pinyin = c.Pinyin
-        }).ToList();
 
     _context.Set<ChineseCharacter>().Add(
       new ChineseCharacter {
         Char = cchar.Char,
-        TradChars = TradChars,
+        TradChars = cchar.TradChars,
+        Components = cchar.Components,
+        Derivatives = cchar.Derivatives,
         PrimaryPinyin = cchar.PrimaryPinyin,
         SecondaryPinyin = cchar.SecondaryPinyin,
         Definition = cchar.Definition,

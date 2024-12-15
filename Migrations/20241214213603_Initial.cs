@@ -1,5 +1,4 @@
 ﻿using Microsoft.EntityFrameworkCore.Migrations;
-using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
@@ -11,12 +10,15 @@ namespace ccex_api.Migrations
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.CreateSequence(
+                name: "EntityFrameworkHiLoSequence",
+                incrementBy: 10);
+
             migrationBuilder.CreateTable(
                 name: "Pinyin",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "integer", nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    Id = table.Column<int>(type: "integer", nullable: false),
                     Syllable = table.Column<string>(type: "text", nullable: false),
                     ToneNumber = table.Column<int>(type: "integer", nullable: false),
                     SyllableWithToneMark = table.Column<string>(type: "text", nullable: false)
@@ -30,8 +32,7 @@ namespace ccex_api.Migrations
                 name: "ChineseCharacter",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "integer", nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    Id = table.Column<int>(type: "integer", nullable: false),
                     Char = table.Column<string>(type: "text", nullable: false),
                     BaseId = table.Column<int>(type: "integer", nullable: true),
                     PrimaryPinyin = table.Column<string[]>(type: "text[]", nullable: false),
@@ -40,6 +41,8 @@ namespace ccex_api.Migrations
                     Description = table.Column<string>(type: "text", nullable: false),
                     Frequency = table.Column<int>(type: "integer", nullable: false),
                     PinyinId = table.Column<int>(type: "integer", nullable: true),
+                    Components = table.Column<string>(type: "jsonb", nullable: true),
+                    Derivatives = table.Column<string>(type: "jsonb", nullable: true),
                     TradChars = table.Column<string>(type: "jsonb", nullable: true)
                 },
                 constraints: table =>
@@ -55,30 +58,6 @@ namespace ccex_api.Migrations
                         column: x => x.PinyinId,
                         principalTable: "Pinyin",
                         principalColumn: "Id");
-                });
-
-            migrationBuilder.CreateTable(
-                name: "ChineseCharacterChineseCharacter",
-                columns: table => new
-                {
-                    ComponentsId = table.Column<int>(type: "integer", nullable: false),
-                    DerivativesId = table.Column<int>(type: "integer", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_ChineseCharacterChineseCharacter", x => new { x.ComponentsId, x.DerivativesId });
-                    table.ForeignKey(
-                        name: "FK_ChineseCharacterChineseCharacter_ChineseCharacter_Component~",
-                        column: x => x.ComponentsId,
-                        principalTable: "ChineseCharacter",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_ChineseCharacterChineseCharacter_ChineseCharacter_Derivativ~",
-                        column: x => x.DerivativesId,
-                        principalTable: "ChineseCharacter",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateIndex(
@@ -98,11 +77,6 @@ namespace ccex_api.Migrations
                 column: "PinyinId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_ChineseCharacterChineseCharacter_DerivativesId",
-                table: "ChineseCharacterChineseCharacter",
-                column: "DerivativesId");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_Pinyin_Syllable_ToneNumber",
                 table: "Pinyin",
                 columns: new[] { "Syllable", "ToneNumber" },
@@ -119,13 +93,13 @@ namespace ccex_api.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "ChineseCharacterChineseCharacter");
-
-            migrationBuilder.DropTable(
                 name: "ChineseCharacter");
 
             migrationBuilder.DropTable(
                 name: "Pinyin");
+
+            migrationBuilder.DropSequence(
+                name: "EntityFrameworkHiLoSequence");
         }
     }
 }

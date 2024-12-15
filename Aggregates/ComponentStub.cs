@@ -1,10 +1,10 @@
 namespace ccex_api.Aggregates;
 
-public class TradCharacterStub
+public class ComponentStub
 {
   public string Char { get; set; } = string.Empty;
   public ICollection<string> Pinyin { get; set; } = [];
-  public string? Definition { get; set; } = null;
-  public string? Description { get; set; } = null;
+  public int Frequency { get; set; }
+  public string Parent { get; set; } = string.Empty;
 
 }
