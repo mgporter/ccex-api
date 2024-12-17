@@ -1,5 +1,6 @@
 namespace ccex_api.Controllers;
 
+using System.Text.RegularExpressions;
 using ccex_api.DTOs;
 using ccex_api.Mappers;
 using ccex_api.Models;
@@ -40,11 +41,25 @@ public class ChineseCharacterController : ControllerBase
     return Ok(cchar.ToDTO());
   }
 
-  [HttpGet("{chineseCharacter}")]
-  public async Task<IActionResult> GetByChar([FromRoute] string chineseCharacter)
+  [HttpGet("treemap/{chineseCharacters}")]
+  public async Task<IActionResult> GetCharactersForTreeMap([FromRoute] string chineseCharacters)
   {
-    var cchar = await _repo.GetByCharAsync(chineseCharacter);
+    ISet<string> characterSet = Regex.Split(chineseCharacters, string.Empty).ToHashSet();
 
+    ISet<ChineseCharacterTreeMapDTO> results = await _repo.GetCharactersForTreeMap(characterSet);
+
+    IList<ChineseCharacterTreeMapDTO> orderedResults =  (from s in characterSet
+                                                        join r in results
+                                                        on s equals r.Char
+                                                        select r).ToList();
+
+    return Ok(orderedResults);
+  }
+
+  [HttpGet("details/{chineseCharacter}")]
+  public async Task<IActionResult> GetCharDetails([FromRoute] string chineseCharacter)
+  {
+    var cchar = await _repo.GetFullCharDetails(chineseCharacter);
     if (cchar == null)
     {
       return NotFound();

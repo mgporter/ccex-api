@@ -1,4 +1,5 @@
 using ccex_api.Data;
+using ccex_api.DTOs;
 using ccex_api.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Query;
@@ -29,55 +30,36 @@ public class ChineseCharacterRepository : IChineseCharacterRepository
   public async Task<ChineseCharacter?> GetByIdAsync(int id)
   {
     return await _context.ChineseCharacter
-      .Include(x => x.Components)
-      .Include(x => x.Derivatives)
       .Include(x => x.Variants)
       .Include(x => x.Base)
       .FirstOrDefaultAsync(x => x.Id == id);
   }
 
-  public async Task<ChineseCharacter?> GetByCharAsync(string cchar)
+  public async Task<ISet<ChineseCharacterTreeMapDTO>> GetCharactersForTreeMap(ISet<string> chars)
   {
+    ISet<ChineseCharacterTreeMapDTO> result = await _context.ChineseCharacter
+      .Where(c => chars.Contains(c.Char))
+      .Select(c => new ChineseCharacterTreeMapDTO(
+        c.Id,
+        c.Char,
+        c.Components,
+        c.Derivatives,
+        c.PrimaryPinyin,
+        c.Frequency
+      ))
+      .AsNoTracking()
+      .ToHashSetAsync();
 
-    // return await _context.ChineseCharacter
-    //   .Include(x => x.Components)
-    //   .Include(x => x.Derivatives)
-    //   .Include(x => x.Variants)
-    //   .Include(x => x.Base)
-    //   .FirstOrDefaultAsync(x => x.Char == cchar);
-
-    return await GetFullCharacterQuery().FirstOrDefaultAsync(x => x.Char == cchar);
+    return result;
   }
 
-  private IIncludableQueryable<ChineseCharacter, ChineseCharacter?> GetFullCharacterQuery()
+  public async Task<ChineseCharacter?> GetFullCharDetails(string cchar)
   {
-
-    return _context.ChineseCharacter
+    return await _context.ChineseCharacter
       .Include(x => x.Variants)
-      .Include(x => x.Base);
+      .Include(x => x.Base)
+      .AsNoTracking()
+      .FirstOrDefaultAsync(x => x.Char == cchar);
   }
 
 }
-
-
-
-// public Category GetById(int id)
-//         {
-//             var category = this.ObjectSet.FirstOrDefault(e => e.Id == id);
-
-//             this.IncludeParentCategories(category);
-
-//             return category;
-//         }
-
-//         private void IncludeParentCategories(Category category)
-//         {
-//             var currentCategory = category;
-
-//             do
-//             {
-//                 this.UnitOfWork.Context.Entry(currentCategory).Reference(e => e.ParentCategory).Load();
-//                 currentCategory = currentCategory.ParentCategory;
-//             }
-//             while (currentCategory != null);
-//         }

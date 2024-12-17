@@ -25,16 +25,17 @@ builder.Services.AddDbContext<ApplicationDBContext>(optionsBuilder => {
 builder.Services.AddScoped<IChineseCharacterRepository, ChineseCharacterRepository>();
 builder.Services.AddScoped<IPinyinRepository, PinyinRepository>();
 
+string CORSPOLICY_AllowDevServer = "AllowDevServer";
+builder.Services.AddCors(options => 
+{
+    options.AddPolicy(
+        CORSPOLICY_AllowDevServer,
+        policy => policy.WithOrigins("http://localhost:5173")
+    );
+});
 
+// "Microsoft.EntityFrameworkCore.Database.Command": "Warning"
 var app = builder.Build();
-
-// var optionsBuilder = new DbContextOptionsBuilder();
-// optionsBuilder.UseNpgsql(
-//     builder.Configuration.GetConnectionString("DefaultConnection"),
-//     npgsqlOptions => npgsqlOptions.SetPostgresVersion(17, 2)
-// );
-// var loader = new DBResourceLoader2(optionsBuilder.Options);
-// loader.LoadInitialCharData();
 
 if (app.Environment.IsDevelopment())
 {
@@ -43,6 +44,8 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+app.UseCors(CORSPOLICY_AllowDevServer);
 
 app.MapControllers();
 
