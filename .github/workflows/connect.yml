@@ -21,11 +21,12 @@ jobs:
       - name: Restore dependencies
         run: dotnet restore
       - name: Build
-        run: dotnet publish --os Linux --no-restore
+        run: dotnet publish --no-restore --os linux
       - name: Test
         run: dotnet test --no-build --verbosity normal
   deploy:
     name: deploy to EC2 2
+    needs: build
     runs-on: ubuntu-latest
     steps:
       - name: Deploy to Server
