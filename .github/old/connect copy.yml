@@ -1,0 +1,28 @@
+name: login to EC2
+
+on:
+  push:
+    branches: ['main']
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    name: deploy to EC2 2
+    runs-on: ubuntu-latest
+    steps:
+      - name: Add SSH Key
+        env:
+          SSH_AUTH_SOCK: /tmp/ssh_agent.sock
+        run: |
+          mkdir -p /home/runner/.ssh
+          ssh-keyscan ec2-user@ec2-3-138-36-132.us-east-2.compute.amazonaws.com >> /home/runner/.ssh/known_hosts
+          echo "${{ secrets.EC2_PRIVATE_KEY }}" > /home/runner/.ssh/github_actions
+          chmod 600 /home/runner/.ssh/github_actions
+          ssh-agent -a $SSH_AUTH_SOCK > /dev/null
+          ssh_add /home/runner/.ssh/github_actions
+      - name: connect
+        env:
+          SSH_AUTH_SOCK: /tmp/ssh_agent.sock
+        run: ssh ec2-user@ec2-3-138-36-132.us-east-2.compute.amazonaws.com
