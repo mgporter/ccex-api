@@ -48,12 +48,12 @@ public class ChineseCharacterController : ControllerBase
 
     ISet<ChineseCharacterTreeMapDTO> results = await _repo.GetCharactersForTreeMap(characterSet);
 
-    IList<ChineseCharacterTreeMapDTO> orderedResults =  (from s in characterSet
-                                                        join r in results
-                                                        on s equals r.Char
-                                                        select r).ToList();
+    // IList<ChineseCharacterTreeMapDTO> orderedResults =  (from s in characterSet
+    //                                                     join r in results
+    //                                                     on s equals r.Char
+    //                                                     select r).ToList();
 
-    return Ok(orderedResults);
+    return Ok(results);
   }
 
   [HttpGet("details/{chineseCharacter}")]

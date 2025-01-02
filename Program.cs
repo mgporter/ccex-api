@@ -39,22 +39,45 @@ builder.Services.AddCors(options =>
     );
 });
 
+string CORSPOLICY_AllowProdServer = "AllowProdServer";
+builder.Services.AddCors(options => 
+{
+    options.AddPolicy(
+        CORSPOLICY_AllowProdServer,
+        policy => policy.WithOrigins(
+            "*"
+        )
+    );
+});
+
 // "Microsoft.EntityFrameworkCore.Database.Command": "Warning"
 
 var app = builder.Build();
+
+app.MapGet("/", () => "CCEX server is running.");
 
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
-
 }
-
 
 app.UseMiddleware<RequestLoggingMiddleware>();
 
-app.UseHttpsRedirection();
+// app.UseHttpsRedirection();
 
+if (app.Environment.IsDevelopment())
+{
+    app.UseCors(CORSPOLICY_AllowDevServer);
+    Console.WriteLine("Starting with profile DEVELOPMENT.");
+}
+
+
+if (app.Environment.IsProduction())
+{
+    app.UseCors(CORSPOLICY_AllowProdServer);
+    Console.WriteLine("Starting with profile PRODUCTION.");
+}
 
 
 app.UseCors(CORSPOLICY_AllowDevServer);
