@@ -24,11 +24,6 @@ jobs:
         run: dotnet publish --no-restore --os linux
       - name: Test
         run: dotnet test --no-build --verbosity normal
-  deploy:
-    name: deploy to EC2 2
-    needs: build
-    runs-on: ubuntu-latest
-    steps:
       - name: Deploy to Server
         uses: easingthemes/ssh-deploy@main
         with:
