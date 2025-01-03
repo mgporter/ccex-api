@@ -9,7 +9,7 @@ on:
 
 jobs:
   build:
-    name: Build application
+    name: Build app and deploy on EC2
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repo
@@ -34,5 +34,5 @@ jobs:
           TARGET: "/home/ec2-user"
           SCRIPT_AFTER_REQUIRED: true
           SCRIPT_AFTER: |
-            ls -al
-            echo $RSYNC_STDOUT
+            cd publish
+            pm2 start dotnet -- ccex-api.dll --urls "http://*:5000;https://*:5001;"
