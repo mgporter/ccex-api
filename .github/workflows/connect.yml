@@ -34,5 +34,9 @@ jobs:
           TARGET: "/home/ec2-user"
           SCRIPT_AFTER_REQUIRED: true
           SCRIPT_AFTER: |
+            export DOTNET_ROOT=$HOME/dotnet
+            export PATH=$PATH:$HOME/dotnet:$HOME/.dotnet/tools
+            export DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=1
+            export NVM_DIR=$HOME/.nvm
             cd publish
             pm2 start dotnet -- ccex-api.dll --urls "http://*:5000;https://*:5001;"
