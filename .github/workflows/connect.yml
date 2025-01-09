@@ -19,11 +19,11 @@ jobs:
         with:
           dotnet-version: 9.0.x
       - name: Restore dependencies
-        run: dotnet restore
+        run: dotnet restore /p:Configuration=Release
       - name: Build
         run: dotnet publish --no-restore --os linux /p:Configuration=Release
       - name: Test
-        run: dotnet test --no-build --verbosity normal
+        run: dotnet test --no-build --verbosity normal /p:Configuration=Release
       - name: Deploy to Server
         uses: easingthemes/ssh-deploy@v5.1.0
         with:
@@ -39,4 +39,5 @@ jobs:
             export DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=1
             export NVM_DIR=$HOME/.nvm
             cd publish
+            pm2 delete all
             pm2 start dotnet -- ccex-api.dll --urls "http://*:5000;https://*:5001;"
