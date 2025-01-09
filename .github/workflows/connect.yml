@@ -21,7 +21,7 @@ jobs:
       - name: Restore dependencies
         run: dotnet restore
       - name: Build
-        run: dotnet publish --no-restore --os linux
+        run: dotnet publish --no-restore --os linux /p:Configuration=Release
       - name: Test
         run: dotnet test --no-build --verbosity normal
       - name: Deploy to Server

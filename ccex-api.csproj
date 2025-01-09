@@ -5,7 +5,7 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <RootNamespace>ccex_api</RootNamespace>
-    <RuntimeIdentifier Condition=" '$(Configuration)'=='Production' ">linux-x64</RuntimeIdentifier>
+    <RuntimeIdentifier Condition=" '$(Configuration)'=='Release' ">linux-x64</RuntimeIdentifier>
   </PropertyGroup>
 
   <ItemGroup>
